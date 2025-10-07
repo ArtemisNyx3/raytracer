@@ -8,3 +8,5 @@ cmake --build
 
 executable is in build/debug
 .\build\Debug\raytracer.exe | set-content image.ppm -encoding String
+
+view using irfan viewer
