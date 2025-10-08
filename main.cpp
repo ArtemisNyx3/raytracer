@@ -5,25 +5,35 @@
 #include <iostream>
 #include <chrono>
 
-bool hit_sphere(const point3 &center, double radius, const ray &r)
+double hit_sphere(const point3 &center, double radius, const ray &r)
 {
     vec3 oc = center - r.origin();
     auto a = dot(r.direction(), r.direction());
     auto b = -2.0 * dot(r.direction(), oc);
     auto c = dot(oc, oc) - radius * radius;
     auto discriminant = b * b - 4 * a * c;
-    return (discriminant >= 0);
+
+    if (discriminant < 0)
+    {
+        return -1.0;
+    }
+    return (-b - std::sqrt(discriminant)) / (2 * a); // + is the normal coming out ; - is the normal in other direction that what we want
 }
 
 color ray_color(const ray &r)
 {
-    // if casted ray intersects with sphere, return red
-    if (hit_sphere(point3(0, 0, 1), 0.5, r))
-        return color(1, 0, 0);
-
+    auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
+    if (t > 0)
+    {
+        // solution exists and we normals origin
+        // color accordingly
+        vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));
+        return 0.5 * color(N.x() + 1, N.y() + 1, N.z() + 1);
+    }
+    // if no solution or ray didnt intersect with sphere
     vec3 unit_direction = unit_vector(r.direction());
     auto a = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.1, 0.5, 0.7);
+    return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
 }
 
 int main()
