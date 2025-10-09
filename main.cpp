@@ -6,30 +6,13 @@
 
 #include <chrono>
 
-double hit_sphere(const point3 &center, double radius, const ray &r)
+color ray_color(const ray &r, const hittable &world)
 {
-    vec3 oc = center - r.origin();
-    auto a = r.direction().length_squared();
-    auto h = dot(r.direction(), oc);
-    auto c = oc.length_squared() - radius * radius;
-    auto discriminant = h * h - a * c;
-
-    if (discriminant < 0)
+    hit_record rec;
+    if (world.hit(r, 0, infinity, rec))
+    // if ray intersects aka solution exists
     {
-        return -1.0;
-    }
-    return (h - std::sqrt(discriminant)) / a;
-}
-
-color ray_color(const ray &r)
-{
-    auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
-    if (t > 0)
-    {
-        // solution exists and we normals origin
-        // color accordingly
-        vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));
-        return 0.5 * color(N.x() + 1, N.y() + 1, N.z() + 1);
+        return 0.5 * (rec.normal + color(1, 1, 1));
     }
     // if no solution or ray didnt intersect with sphere
     vec3 unit_direction = unit_vector(r.direction());
@@ -47,6 +30,11 @@ int main()
     // Calculate the image height, and ensure that it's at least 1.
     int image_height = int(image_width / aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;
+
+    // World
+    hittable_list world;
+    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
 
     // Camera
     auto focal_length = 1.0;
@@ -80,7 +68,7 @@ int main()
             auto ray_direction = pixel_center - camera_center;
             ray r(camera_center, ray_direction);
 
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
