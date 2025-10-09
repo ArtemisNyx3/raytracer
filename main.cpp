@@ -1,8 +1,9 @@
-#include "color.h"
-#include "vec3.h"
-#include "ray.h"
+#include "raytracer.h"
 
-#include <iostream>
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
+
 #include <chrono>
 
 double hit_sphere(const point3 &center, double radius, const ray &r)
