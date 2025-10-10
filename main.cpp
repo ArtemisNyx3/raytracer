@@ -11,12 +11,6 @@ int main()
 {
     auto start_time = std::chrono::high_resolution_clock::now();
     // Image
-    auto aspect_ratio = 16.0 / 9.0;
-    int image_width = 800;
-
-    // Calculate the image height, and ensure that it's at least 1.
-    int image_height = int(image_width / aspect_ratio);
-    image_height = (image_height < 1) ? 1 : image_height;
 
     // World
     hittable_list world;
@@ -26,14 +20,12 @@ int main()
     // Camera
     camera cam;
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 400;
+    cam.image_width = 800;
+    cam.samples_per_pixel = 100;
 
     cam.render(world);
 
     // Render
-
-    std::clog
-        << "Generated a " << image_width << " X " << image_height << " PPM image.\n";
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
